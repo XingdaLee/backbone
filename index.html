@@ -23,6 +23,23 @@
       // todoItem.toJSON();
       // todoItem.get('title');
       // todoItem.set('title','test1111');
+      var ToDoItemView = Backbone.View.extend({
+        tagName:"p",
+        id:"p_header",
+        // attributes:{
+        //   style:"color:red"
+        // },
+        // $el是jquery的封装,model负责数据，数据的呈现写在render里面
+        render:function() {
+          this.$el.html('<span>'+this.model.get('title')+'</span>');
+          return this;
+        }
+      });
+      var toDoItemView = new ToDoItemView({
+        model:todoItem
+      });
+      toDoItemView.render();
+      toDoItemView.$el.appendTo($('body'));
     </script>
     <div class="">
       sjdasjdkasdsj
