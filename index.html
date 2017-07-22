@@ -19,27 +19,22 @@
       });
       // 实例化,设置obj
       var todoItem = new ToDoItem(obj);
-      // 取和设置obj
-      // todoItem.toJSON();
-      // todoItem.get('title');
-      // todoItem.set('title','test1111');
-      var ToDoItemView = Backbone.View.extend({
-        tagName:"p",
-        id:"p_header",
-        // attributes:{
-        //   style:"color:red"
-        // },
-        // $el是jquery的封装,model负责数据，数据的呈现写在render里面
-        render:function() {
-          this.$el.html('<span>'+this.model.get('title')+'</span>');
-          return this;
+      var todoItem2 = new ToDoItem(obj);
+      // this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
+      todoItem.on('change',function() {
+        console.log(this.changed);
+        if (this.hasChanged('title')) {
+          console.log('title changed!');
+        }else {
+          console.log('description changed!');
         }
       });
-      var toDoItemView = new ToDoItemView({
-        model:todoItem
-      });
-      toDoItemView.render();
-      toDoItemView.$el.appendTo($('body'));
+      // todoItem2监听todoItem的change方法
+      todoItem2.listenTo(todoItem,'change',function(){
+        // this指向todoItem2
+        console.log(this);
+      })
+
     </script>
     <div class="">
       sjdasjdkasdsj
