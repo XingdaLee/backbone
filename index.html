@@ -1,43 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>backbone</title>
-    <script src="./node_modules/underscore/underscore-min.js"></script>
-    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="./node_modules/backbone/backbone.js"></script>
-  </head>
-  <body>
-    <script type="text/javascript">
-      var obj = {
-        "title":"task1",
-        "description":"description1"
-      };
-      // 类
-      var ToDoItem = Backbone.Model.extend({
 
-      });
-      // 实例化,设置obj
-      var todoItem = new ToDoItem(obj);
-      var todoItem2 = new ToDoItem(obj);
-      // this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
-      todoItem.on('change',function() {
-        console.log(this.changed);
-        if (this.hasChanged('title')) {
-          console.log('title changed!');
-        }else {
-          console.log('description changed!');
-        }
-      });
-      // todoItem2监听todoItem的change方法
-      todoItem2.listenTo(todoItem,'change',function(){
-        // this指向todoItem2
-        console.log(this);
-      })
+<head>
+  <meta charset="utf-8">
+  <title>backbone</title>
+  <script src="./node_modules/underscore/underscore-min.js"></script>
+  <script src="./node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="./node_modules/backbone/backbone.js"></script>
+</head>
 
-    </script>
-    <div class="">
-      sjdasjdkasdsj
-    </div>
-  </body>
+<body>
+  <script type="text/javascript">
+    var obj = {
+      "title": "task1",
+      "description": "description1"
+    };
+    // 类
+    var ToDoItem = Backbone.Model.extend({
+
+    });
+    // 实例化,设置obj
+    var todoItem = new ToDoItem(obj);
+    var todoItem2 = new ToDoItem({
+      "title": "task2",
+      "description": "description2"
+    });
+    // mode;监听model的变化
+    // this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
+    todoItem.on('change', function() {
+      console.log(this.changed);
+      if (this.hasChanged('title')) {
+        console.log('title changed!');
+      } else {
+        console.log('description changed!');
+      }
+    });
+    // todoItem2监听todoItem的change方法
+    todoItem2.listenTo(todoItem, 'change', function() {
+      // this指向todoItem2
+      console.log(this);
+    })
+    // view监听model的变化
+    var ToDoItemView = Backbone.View.extend({
+      tagName: "div",
+      className: "todo-item",
+      events: {
+        'click button': 'deleteFunc',
+      },
+      initialize: function() {
+        this.listenTo(todoItem, 'change', this.render);
+        this.listenTo(this.model, 'destroy', this.remove);
+      },
+      render: function() {
+        var json = this.model.toJSON();
+        // console.log('model is changed for initialize');
+        this.$el.html('<h3>' + json.title + '</h3><p>' + json.description + '</p><button>delete</button>');
+        return this;
+      },
+      deleteFunc: function() {
+        // 第一种方法直接调用remove
+        // this.remove();
+        // 第二种是从数据角度
+        this.model.destroy();
+      }
+    });
+    // 引用model和todoItem做关联
+    var todoItemView = new ToDoItemView({
+      model: todoItem,
+      // el:'#p1'
+    });
+    var todoItemView2 = new ToDoItemView({
+      model: todoItem2,
+      // el:'#p2'
+    });
+    todoItemView.render().$el.appendTo($('body'));
+    todoItemView2.render().$el.appendTo('body');
+  </script>
+  <div style="color:#ccc;border-top: 1px solid #ccc;margin-top: 120px;">
+    backbone By LIXINGDA
+  </div>
+</body>
+
 </html>

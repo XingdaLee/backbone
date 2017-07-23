@@ -85,3 +85,97 @@ todoItem2.listenTo(todoItem,'change',function(){
   console.log(this);
 })
 ```
+（9）View的监听机制，view可以监听model的变化，方法也是listenTo
+
+### View和Model的事件关联(initialize增加自定义初始化)
+
+一些公共的方法写到initialize里，以后类似todoItemView这样实例化后，都会调用
+
+```
+// view监听model的变化
+var ToDoItemView = Backbone.View.extend({
+  initialize:function() {
+    this.listenTo(todoItem,'change',this.render);
+  },
+  render:function() {
+    console.log('model is changed for initialize');
+  }
+});
+// 引用model和todoItem做关联
+var todoItemView = new ToDoItemView({
+  model:todoItem
+});
+```
+实践代码:
+```
+var obj = {
+  "title": "task1",
+  "description": "description1"
+};
+// 类
+var ToDoItem = Backbone.Model.extend({
+
+});
+// 实例化,设置obj
+var todoItem = new ToDoItem(obj);
+var todoItem2 = new ToDoItem({
+  "title": "task2",
+  "description": "description2"
+});
+// mode;监听model的变化
+// this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
+todoItem.on('change', function() {
+  console.log(this.changed);
+  if (this.hasChanged('title')) {
+    console.log('title changed!');
+  } else {
+    console.log('description changed!');
+  }
+});
+// todoItem2监听todoItem的change方法
+todoItem2.listenTo(todoItem, 'change', function() {
+  // this指向todoItem2
+  console.log(this);
+})
+// view监听model的变化
+var ToDoItemView = Backbone.View.extend({
+  tagName: "div",
+  className: "todo-item",
+  events: {
+    'click button': 'deleteFunc',
+  },
+  initialize: function() {
+    this.listenTo(todoItem, 'change', this.render);
+    this.listenTo(this.model, 'destroy', this.remove);
+  },
+  render: function() {
+    var json = this.model.toJSON();
+    // console.log('model is changed for initialize');
+    this.$el.html('<h3>' + json.title + '</h3><p>' + json.description + '</p><button>delete</button>');
+    return this;
+  },
+  deleteFunc: function() {
+    // 第一种方法直接调用remove
+    // this.remove();
+    // 第二种是从数据角度
+    this.model.destroy();
+  }
+});
+// 引用model和todoItem做关联
+var todoItemView = new ToDoItemView({
+  model: todoItem,
+  // el:'#p1'
+});
+var todoItemView2 = new ToDoItemView({
+  model: todoItem2,
+  // el:'#p2'
+});
+todoItemView.render().$el.appendTo($('body'));
+todoItemView2.render().$el.appendTo('body');
+```
+实践代码说明:
+(1)view事件注册使用对象events，click可以使用选择器形式,如click button
+
+(2)当前的数据对象模型是 this.model
+
+(3)删除节点的两种方法，第一种直接使用this.remove(); 第二种（最佳）调用this.model.destroy()直接删除数据，然后在使用this.listenTo(this.model, 'destroy', this.remove);监听到以后，在调用this.remove
