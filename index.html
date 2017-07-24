@@ -11,70 +11,109 @@
 
 <body>
   <script type="text/javascript">
-    var obj = {
-      "title": "task1",
-      "description": "description1"
-    };
-    // 类
-    var ToDoItem = Backbone.Model.extend({
-
-    });
-    // 实例化,设置obj
-    var todoItem = new ToDoItem(obj);
-    var todoItem2 = new ToDoItem({
-      "title": "task2",
-      "description": "description2"
-    });
-    // mode;监听model的变化
-    // this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
-    todoItem.on('change', function() {
-      console.log(this.changed);
-      if (this.hasChanged('title')) {
-        console.log('title changed!');
-      } else {
-        console.log('description changed!');
-      }
-    });
-    // todoItem2监听todoItem的change方法
-    todoItem2.listenTo(todoItem, 'change', function() {
-      // this指向todoItem2
-      console.log(this);
-    })
-    // view监听model的变化
-    var ToDoItemView = Backbone.View.extend({
-      tagName: "div",
-      className: "todo-item",
-      events: {
-        'click button': 'deleteFunc',
+    // var obj = {
+    //   "title": "task1",
+    //   "description": "description1"
+    // };
+    // // 类
+    // var ToDoItem = Backbone.Model.extend({
+    //
+    // });
+    // // 实例化,设置obj
+    // var todoItem = new ToDoItem(obj);
+    // var todoItem2 = new ToDoItem({
+    //   "title": "task2",
+    //   "description": "description2"
+    // });
+    // // mode;监听model的变化
+    // // this.changed,this指向todoItem。changed是哪个值改变了救会显示哪个值
+    // todoItem.on('change', function() {
+    //   console.log(this.changed);
+    //   if (this.hasChanged('title')) {
+    //     console.log('title changed!');
+    //   } else {
+    //     console.log('description changed!');
+    //   }
+    // });
+    // // todoItem2监听todoItem的change方法
+    // todoItem2.listenTo(todoItem, 'change', function() {
+    //   // this指向todoItem2
+    //   console.log(this);
+    // })
+    // // view监听model的变化
+    // var ToDoItemView = Backbone.View.extend({
+    //   tagName: "div",
+    //   className: "todo-item",
+    //   events: {
+    //     'click button': 'deleteFunc',
+    //   },
+    //   initialize: function() {
+    //     this.listenTo(todoItem, 'change', this.render);
+    //     this.listenTo(this.model, 'destroy', this.remove);
+    //   },
+    //   render: function() {
+    //     var json = this.model.toJSON();
+    //     // console.log('model is changed for initialize');
+    //     this.$el.html('<h3>' + json.title + '</h3><p>' + json.description + '</p><button>delete</button>');
+    //     return this;
+    //   },
+    //   deleteFunc: function() {
+    //     // 第一种方法直接调用remove
+    //     // this.remove();
+    //     // 第二种是从数据角度
+    //     this.model.destroy();
+    //   }
+    // });
+    // // 引用model和todoItem做关联
+    // var todoItemView = new ToDoItemView({
+    //   model: todoItem,
+    //   // el:'#p1'
+    // });
+    // var todoItemView2 = new ToDoItemView({
+    //   model: todoItem2,
+    //   // el:'#p2'
+    // });
+    // todoItemView.render().$el.appendTo($('body'));
+    // todoItemView2.render().$el.appendTo('body');
+    // =--------------------------------------------------------------------
+    // var Cat = function() {
+    //
+    // };
+    // // 将Backbone.Events对象绑定到Cat.prototype
+    // _.extend(Cat.prototype,Backbone.Events);
+    // var tom = new Cat();
+    // var jerry = new Cat();
+    // jerry.listenTo(tom,'run',function(){
+    //   // 只看run输出后的tom
+    //   console.log('run');
+    //   console.log(tom);
+    // });
+    // tom.trigger('run');
+    // ----------------------------------------------------------------------
+    // 如果请求后服务器中返回了id和code的属性，backbone会做一个同步，将id和code封装到task中
+    var Task = Backbone.Model.extend({
+      idAttribute:"id",
+      defaults:{
+        'identify':'p_lixd'
       },
-      initialize: function() {
-        this.listenTo(todoItem, 'change', this.render);
-        this.listenTo(this.model, 'destroy', this.remove);
-      },
-      render: function() {
-        var json = this.model.toJSON();
-        // console.log('model is changed for initialize');
-        this.$el.html('<h3>' + json.title + '</h3><p>' + json.description + '</p><button>delete</button>');
-        return this;
-      },
-      deleteFunc: function() {
-        // 第一种方法直接调用remove
-        // this.remove();
-        // 第二种是从数据角度
-        this.model.destroy();
-      }
+      urlRoot:"http://repit.sinaapp.com/api/task"
     });
-    // 引用model和todoItem做关联
-    var todoItemView = new ToDoItemView({
-      model: todoItem,
-      // el:'#p1'
+    var task = new Task({
+      'title':'coursl',
     });
-    var todoItemView2 = new ToDoItemView({
-      model: todoItem2,
-      // el:'#p2'
-    });
-    todoItemView.render().$el.appendTo($('body'));
-    todoItemView2.render().$el.appendTo('body');
+    // 第一次是post
+    task.save();
+    console.log(task);
+    // 如果在save，因为task里已经有id，backbone会认为服务器中已经存在该条数据，只会执行更新操作
+    task.set('title','cours2')
+    // 第二次put更新，内建机制，前提是有id属性
+    task.save();
+    // 更改Method.
+    task.save({title:'cours3'},{patch:true});
+    // 删除,task会自动传id到后台Method是delete，进行删除
+    task.destroy();
+    // 根据id拉取数据
+    task.fetch();
   </script>
   <div style="color:#ccc;border-top: 1px solid #ccc;margin-top: 120px;">
     backbone By LIXINGDA

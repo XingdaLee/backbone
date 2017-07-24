@@ -179,3 +179,72 @@ todoItemView2.render().$el.appendTo('body');
 (2)当前的数据对象模型是 this.model
 
 (3)删除节点的两种方法，第一种直接使用this.remove(); 第二种（最佳）调用this.model.destroy()直接删除数据，然后在使用this.listenTo(this.model, 'destroy', this.remove);监听到以后，在调用this.remove
+
+## Backbone事件原理(单独使用Events)
+
+```
+var Cat = function() {
+
+};
+// 将Backbone.Events对象绑定到Cat.prototype
+_.extend(Cat.prototype,Backbone.Events);
+var tom = new Cat();
+var jerry = new Cat();
+jerry.listenTo(tom,'run',function(){
+  // 只看run输出后的tom
+  console.log('run');
+  console.log(tom);
+});
+tom.trigger('run');
+```
+
+## 和服务器交互(model和restful的通信)
+
+示例代码:
+
+```
+// 如果请求后服务器中返回了id和code的属性，backbone会做一个同步，将id和code封装到task中
+var Task = Backbone.Model.extend({
+  idAttribute:"id",
+  defaults:{
+    'identify':'p_lixd'
+  },
+  urlRoot:"http://repit.sinaapp.com/api/task"
+});
+var task = new Task({
+  'title':'coursl',
+});
+// 第一次是post
+task.save();
+console.log(task);
+// 如果在save，因为task里已经有id，backbone会认为服务器中已经存在该条数据，只会执行更新操作
+task.set('title','cours2')
+// 第二次put更新，内建机制，前提是有id属性
+task.save();
+// 更改Method.
+task.save({title:'cours3'},{patch:true});
+// 删除,task会自动传id到后台Method是delete，进行删除
+task.destroy();
+// 根据id拉取数据
+task.fetch();
+
+```
+idAttribute:设置默认的标识，如果不设置默认是id
+
+save方法包含:POST、PUT、PATCH
+
+destroy包含:DELETE、'destroy'事件（根据id删除数据）
+
+fetch:GET（根据id获取数据）
+
+defaults:设置默认属性,task里也可以重新定义属性的值，可以直接覆盖defaults里的属性
+
+urlRoot的规则
+
+sync事件：上面的所有和服务器交互的事件都会触发sync。例如监听sync事件:
+
+```
+task.on("sync", function() {
+  debugger
+});
+```
