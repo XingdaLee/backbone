@@ -248,3 +248,10 @@ task.on("sync", function() {
   debugger
 });
 ```
+## Backbone集合
+
+集合基本用法：
+
+集合事件
+
+集合与服务器交互

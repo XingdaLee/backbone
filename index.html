@@ -91,29 +91,83 @@
     // tom.trigger('run');
     // ----------------------------------------------------------------------
     // 如果请求后服务器中返回了id和code的属性，backbone会做一个同步，将id和code封装到task中
-    var Task = Backbone.Model.extend({
-      idAttribute:"id",
-      defaults:{
-        'identify':'p_lixd'
+    // var Task = Backbone.Model.extend({
+    //   idAttribute:"id",
+    //   defaults:{
+    //     'identify':'p_lixd'
+    //   },
+    //   urlRoot:"http://repit.sinaapp.com/api/task"
+    // });
+    // var task = new Task({
+    //   'title':'coursl',
+    // });
+    // // 第一次是post
+    // task.save();
+    // console.log(task);
+    // // 如果在save，因为task里已经有id，backbone会认为服务器中已经存在该条数据，只会执行更新操作
+    // task.set('title','cours2')
+    // // 第二次put更新，内建机制，前提是有id属性
+    // task.save();
+    // // 更改Method.
+    // task.save({title:'cours3'},{patch:true});
+    // // 删除,task会自动传id到后台Method是delete，进行删除
+    // task.destroy();
+    // // 根据id拉取数据
+    // task.fetch();
+    var list = [{
+        title: 'title1',
+        derscription: "description1"
       },
-      urlRoot:"http://repit.sinaapp.com/api/task"
+      {
+        title: 'title2',
+        derscription: "description2"
+      },
+      {
+        title: 'title3',
+        derscription: "description3"
+      }
+    ];
+    var MyList = Backbone.Collection.extend({
+      // model: Model,
+      //
+      // initialize: function (args) {
+      //   // super
+      // }
     });
-    var task = new Task({
-      'title':'coursl',
+    var aList = new MyList(list);
+    // toJSON转换普通js对象
+    // aList.toJSON();
+    // 在集合中查找
+    aList.find(function(model) {
+      return model.get('title') == 'title1'
     });
-    // 第一次是post
-    task.save();
-    console.log(task);
-    // 如果在save，因为task里已经有id，backbone会认为服务器中已经存在该条数据，只会执行更新操作
-    task.set('title','cours2')
-    // 第二次put更新，内建机制，前提是有id属性
-    task.save();
-    // 更改Method.
-    task.save({title:'cours3'},{patch:true});
-    // 删除,task会自动传id到后台Method是delete，进行删除
-    task.destroy();
-    // 根据id拉取数据
-    task.fetch();
+    //返回的是数组，不是集合
+    var foo = aList.filter(function(model) {
+      return model.get('title') == 'title1'
+    });
+    //是find和fliter的简写
+    var foo2 = aList.where({
+      'title': 'title1'
+    }, true);
+    // 是否都必须满足条件，一个不满足就返回false
+    var foo3 = aList.every(function(model) {
+      return model.get('title') != null;
+    });
+    // 只要有已个条件满足就可以了，返回true
+    var foo4 = aList.some(function(model) {
+      return model.get('title') != null;
+    });
+    // 娶每一个model相同的属性，只需要传属性进去。返回数组
+    var foo5 = aList.pluck('title');
+    // 迭代，每个元素迭代，结果是数组。对某个model的属性重新组数组。可以对集合变形
+    var foo6 = aList.map(function(model) {
+      return model.get('title');
+    });
+    //把集合变成一个值，所有元素聚合成一个元素.memo上一次结果,index遍历到第几个
+    // 后面的'' 是初始值
+    var foo7 = aList.reduce(function(memo, model, index) {
+      return memo + ',' +model.get('title')
+    },'')
   </script>
   <div style="color:#ccc;border-top: 1px solid #ccc;margin-top: 120px;">
     backbone By LIXINGDA
